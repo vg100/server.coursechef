@@ -6,8 +6,8 @@
   "test": "echo \"Error: no test specified\" && exit 1",
   "server:dev": "nodemon .",
   "server:prod": "NODE_ENV=production nodemon .",
-  "pm2:dev": "pm2 start index.js --name dev.coursechef --watch",
-  "pm2:prod": "pm2 start index.js --name prod.coursechef --env production"
+  "pm2:dev": "pm2 start index.js --name dev.coursechef",
+  "pm2:prod": "NODE_ENV=production pm2 start index.js --name 'prod.coursechef'"
 },
   "keywords": [],
   "author": "",
