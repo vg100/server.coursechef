@@ -245,6 +245,21 @@ class CourseController {
             }
           
     }
+
+    static async retryImage(req, res, next) {
+        const receivedData = req.body;
+        const promptString = receivedData.prompt;
+        gis(promptString, logResults);
+        function logResults(error, results) {
+            if (error) { }
+            else {
+                res.status(200).json({ url: results[1].url });
+            }
+        }
+    }
+
+
+
 }
 
 

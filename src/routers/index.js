@@ -30,6 +30,8 @@ const RozorpayController = require("../Controller/RazorpayController");
 const LogController = require("../Controller/LogController");
 const UserController = require("../Controller/UserController");
 const CourseController = require("../Controller/CourseController");
+const logger = require("../Utils/logger");
+const ProfileController = require("../Controller/ProfileController");
 
 //INITIALIZE
 const router=Router();
@@ -831,6 +833,17 @@ router.post("/razorpay-webhook", RozorpayController.webhook);
 router.get('/logs', LogController.log);
 
 router.post("/importcourse", CourseController.importCourse);
+
+router.post("/log/create",(req, res, next)=>{
+  logger.error(req.body);
+})
+
+router.post("/retryImage",CourseController.retryImage)
+
+router.patch("/profile/update/:id",ProfileController.updateProfile)
+router.get("/profile/get/:id",ProfileController.getProfile)
+router.post("/recommendedcourses",ProfileController.getRecommended)
+
 
 
 module.exports = router;

@@ -22,6 +22,19 @@ class GenerativeAI {
             throw error;
         }
     }
+
+    async getSomecourseRecommandation(prompt) {
+        try {
+            const model = this.client.getGenerativeModel({ model: "gemini-pro", safetySettings: this.safetySettings });
+            const { response } = await model.generateContent(prompt)
+            return response.text()
+        } catch {
+
+        }
+    }
+
+
+
 }
 
 module.exports = new GenerativeAI();
