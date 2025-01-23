@@ -10,3 +10,18 @@ const subscriptionSchema = new mongoose.Schema({
     active: { type: Boolean, default: true }
   });
   module.exports = mongoose.model("Subscription", subscriptionSchema);
+
+
+
+//   const mongoose = require('mongoose');
+
+// const SubscriptionSchema = new mongoose.Schema({
+//     userId: { type: mongoose.Schema.Types.ObjectId, required: true },
+//     plan: { type: String, enum: ['monthly', 'yearly'], required: true },
+//     status: { type: String, enum: ['active', 'pending', 'canceled'], default: 'pending' },
+//     startDate: { type: Date, default: Date.now },
+//     endDate: { type: Date },
+//     paymentId: { type: String, required: true },
+// }, { timestamps: true });
+
+// module.exports = mongoose.model('Subscription', SubscriptionSchema);

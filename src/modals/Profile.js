@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const subscriptionSchema = new mongoose.Schema({
-  plan: { type: String },
+  plan: { type: String, default: 'free' },
   startDate: { type: Date },
   endDate: { type: Date },
   status: { type: String },
@@ -74,7 +74,7 @@ const settingsSchema = new mongoose.Schema({
 
 // Main profile schema
 const profileSchema = new mongoose.Schema({
-  _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   fullName: { type: String },
   email: { type: String },
   subscription: subscriptionSchema,

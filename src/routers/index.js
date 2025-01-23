@@ -608,6 +608,9 @@ router.post("/razorpaycreate", RozorpayController.createSubscription);
 //GET RAZORPAY SUBSCRIPTION DETAILS
 router.post("/razorapydetails", RozorpayController.getSubscriptionDetail);
 
+//GET RAZORPAY SUBSCRIPTION DETAILS
+router.post("/getSubscriptionDetailMobile", RozorpayController.getSubscriptionDetailMobile);
+
 //RAZORPAY PENDING
 router.post("/razorapypending", RozorpayController.pendingSubscription);
 

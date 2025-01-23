@@ -5,36 +5,58 @@ const crypto = require("crypto");
 const getEnvironmentVariables = require("../Environment/env");
 const MailServiceProvider = require("../Utils/mailchamp");
 const EmailController = require("./EmailController");
+const Profile = require("../modals/Profile");
 
 class AuthController {
   static async signup(req, res, next) {
     const { email, mName, password, type } = req.body;
-
+  
     try {
-      const estimate = await User.estimatedDocumentCount();
-     
+      // Check if the user already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        throw new Error('User with this email already exists');
+        return res.status(400).json({ success: false, message: 'User with this email already exists' });
       }
-      const newUser = new User({ email, mName, password, type });
-       await newUser.save();
-      //  EmailController.emailVerify({email,mName})
-      EmailController.welcome({email:email,mName:mName})
-      if (estimate === 0) {
-        const newAdmin = new Admin({ email, mName, type: 'main' });
-        await newAdmin.save();
-      }
+  
+      // Create new user
+      const newUser = await User.create({ email, mName, password, type });
+  
+      // Create user profile
+      await Profile.create({
+        userId: newUser._id,
+        fullName: mName,
+        email,
+        subscription: {},
+        learningPreferences: {},
+        courses: [],
+        achievements: {},
+        leaderboard: {},
+        activityLog: [],
+        socialLinks: {},
+        settings: {},
+        auth: {},
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+  
+    await EmailController.welcome({ email, mName })
 
-      res.json({
+      const isFirstUser = (await User.estimatedDocumentCount()) === 1;
+      if (isFirstUser) {
+        await Admin.create({ email, mName, type: 'main' });
+      }
+  
+      res.status(201).json({
         success: true,
         message: 'Account created successfully.',
         userId: newUser._id,
       });
+  
     } catch (error) {
       next(error);
     }
   }
+  
   static async signin(req, res, next) {
     const { email, password } = req.body;
 
@@ -69,14 +91,14 @@ class AuthController {
       }
 
       if (user.isVerified) {
-        
+
         throw new Error('Email is already verified.');
       }
 
       user.isVerified = true;
       user.verificationToken = null;
       await user.save();
-      EmailController.welcome({email:user.email,mName:user.mName})
+      EmailController.welcome({ email: user.email, mName: user.mName })
       res.json({ success: true, message: 'Email verified successfully. You can now log in.' });
     } catch (error) {
       next(error);
@@ -89,7 +111,7 @@ class AuthController {
       const user = await User.findOne({ email });
       if (!user) return res.status(404).send('User not found.');
       if (user.isVerified) return res.status(400).send('Email already verified.');
-      EmailController.emailVerify({email,mName:user.mName})
+      EmailController.emailVerify({ email, mName: user.mName })
       return res.status(200).json({ success: false, message: 'Please verify your email before signing in. Check your inbox for the verification email.' });
     } catch (err) {
       next(err)

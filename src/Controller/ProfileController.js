@@ -25,32 +25,10 @@ function generateUnifiedPrompt(areasOfInterest) {
 class ProfileController {
     static async updateProfile(req, res, next) {
         try {
+            console.log(req.body,'req.body')
             const { id } = req.params;
-            let response = await Profile.findById(id);
-            if (!response) {
-                const newProfile = new Profile({
-                    _id: id,
-                    fullName: '',
-                    email: '',
-                    subscription: {},
-                    learningPreferences: {},
-                    courses: [],
-                    achievements: {},
-                    leaderboard: {},
-                    activityLog: [],
-                    socialLinks: {},
-                    settings: {},
-                    auth: {},
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                });
-
-                response = await newProfile.save();
-            }
-
-            response = await Profile.findByIdAndUpdate(id, req.body, { new: true });
-
-            res.status(200).json(response);
+            await Profile.findOneAndUpdate({ userId: id }, req.body, { new: true });
+            res.status(200).json({});
         } catch (error) {
             next(error);
         }
@@ -61,7 +39,7 @@ class ProfileController {
     static async getProfile(req, res, next) {
         try {
             const { id } = req.params;
-            const getProfile = await Profile.findById(id);
+            const getProfile = await Profile.findOne({ userId: id }).populate("subscription")
             if (!getProfile) {
                 return res.status(404).json({ message: 'Profile not found' });
             }
@@ -74,11 +52,23 @@ class ProfileController {
 
     static async getRecommended(req, res, next) {
         try {
-
+            if(!req.body.selectedInterests?.length) return
             const prompt = generateUnifiedPrompt(req.body.selectedInterests);
             const data = await GenerativeAI.getSomecourseRecommandation(prompt)
-            const cleanedJsonString = data.replace(/```json/g, "").replace(/```/g, "");
-            const parsedJson = JSON.parse(cleanedJsonString);
+
+            let retries = 3;
+            let parsedJson;
+    
+            while (retries > 0) {
+                try {
+                    const cleanedJsonString = data.replace(/```json/g, "").replace(/```/g, "");
+                    parsedJson = JSON.parse(cleanedJsonString);
+                    break;
+                } catch (parseError) {
+                    retries--;
+                    if (retries === 0) throw new Error("Failed to parse JSON after multiple attempts.");
+                }
+            }
             res.status(200).json(parsedJson);
         } catch (error) {
             next(error)
