@@ -84,7 +84,7 @@ class Server {
   }
 
   initializeSocket() {
-    socketController.init("/", this.io);
+    socketController.init("/api1/", this.io);
   }
 
   handleErrors() {
