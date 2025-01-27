@@ -24,7 +24,15 @@ class Server {
         methods: ["GET", "POST"],
         credentials: true,
       },
-      transports: ["websocket"]
+      transports: ["websocket", "polling"], // Support both WebSocket and polling as fallback
+      pingInterval: 25000,  // Ping interval in ms (25s)
+      pingTimeout: 60000,
+      allowEIO3: true,
+      reconnection: true,
+      reconnectionAttempts: 5,   // Retry up to 5 times if the connection drops
+      reconnectionDelay: 1000,   // Delay before retrying (1 second)
+      reconnectionDelayMax: 5000, // Max delay between reconnection attempts (5 seconds)
+
     });
     this.redisClient = createClient({
       password: 'rZCKDcWKvP8Wmbe5oRkBrIc4cWmnlzja',
@@ -76,7 +84,7 @@ class Server {
   }
 
   initializeSocket() {
-    socketController.init("/api1/", this.io);
+    socketController.init("/", this.io);
   }
 
   handleErrors() {
