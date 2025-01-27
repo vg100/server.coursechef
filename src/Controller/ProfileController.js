@@ -1,12 +1,11 @@
 const Profile = require("../modals/Profile");
 const GenerativeAI = require("../Utils/GenerativeAI");
+const SocketController = require("./socketController");
 
 
 
 function generateUnifiedPrompt(areasOfInterest) {
-    console.log(areasOfInterest)
     const selectedAreas = areasOfInterest?.map(area => area?.name).join(', ');
-
     return `Generate a JSON object containing an array of recommended courses related to the provided topics: "${selectedAreas}". Ensure that the recommendations are diverse, specific, and cover various subdomains or related fields. Focus on high-quality, trending, and frequently searched topics. 
 
     Format your response strictly as follows: 
@@ -25,7 +24,6 @@ function generateUnifiedPrompt(areasOfInterest) {
 class ProfileController {
     static async updateProfile(req, res, next) {
         try {
-            console.log(req.body,'req.body')
             const { id } = req.params;
             await Profile.findOneAndUpdate({ userId: id }, req.body, { new: true });
             res.status(200).json({});
@@ -69,7 +67,9 @@ class ProfileController {
                     if (retries === 0) throw new Error("Failed to parse JSON after multiple attempts.");
                 }
             }
-            res.status(200).json(parsedJson);
+            SocketController.emitEvent('courseRecommendations', parsedJson)
+
+            // res.status(200).json(parsedJson);
         } catch (error) {
             next(error)
         }

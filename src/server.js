@@ -6,12 +6,13 @@ const cors = require("cors");
 const router = require("./routers");
 const http = require("http");
 const { Server: SocketIOServer } = require("socket.io");
-const socketController = require("./Controller/socketController");
+
 const logger = require("./Utils/logger");
 const { createClient } = require("redis");
 const dns = require("dns");
 const os = require("os");
 const { health } = require("./Utils/healthcheck");
+const socketController = require("./Controller/socketController");
 
 class Server {
   constructor() {
@@ -61,7 +62,7 @@ class Server {
 
   setRouter() {
     this.app.use('/api1', router);
-    this.app.get('/api1/ping',health)
+    this.app.get('/api1/ping', health)
   }
 
   async initializeRedis() {
@@ -74,7 +75,7 @@ class Server {
   }
 
   initializeSocket() {
-    new socketController("/", this.io)
+    socketController.init("/", this.io);
   }
 
   handleErrors() {
