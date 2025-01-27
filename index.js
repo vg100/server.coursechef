@@ -9,7 +9,6 @@ const numCPUs = os.cpus().length;
 const PORT = getEnvironmentVariables().PORT;
 
 const app = new Server().server;
-  app.timeout = 0;
   app.listen(PORT, () => {
     logger.info(`Server is listening on port ${PORT}`,{ port: 5001 });
   });
