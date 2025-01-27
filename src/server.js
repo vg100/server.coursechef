@@ -24,6 +24,7 @@ class Server {
         methods: ["GET", "POST"],
         credentials: true,
       },
+      transports: ["websocket"]
     });
     this.redisClient = createClient({
       password: 'rZCKDcWKvP8Wmbe5oRkBrIc4cWmnlzja',
