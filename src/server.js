@@ -75,7 +75,7 @@ class Server {
   }
 
   initializeSocket() {
-    socketController.init("/", this.io);
+    socketController.init("/user/", this.io);
   }
 
   handleErrors() {
