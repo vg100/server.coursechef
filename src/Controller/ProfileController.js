@@ -50,13 +50,13 @@ class ProfileController {
 
     static async getRecommended(req, res, next) {
         try {
-            if(!req.body.selectedInterests?.length) return
+            if (!req.body.selectedInterests?.length) return
             const prompt = generateUnifiedPrompt(req.body.selectedInterests);
             const data = await GenerativeAI.getSomecourseRecommandation(prompt)
 
             let retries = 3;
             let parsedJson;
-    
+
             while (retries > 0) {
                 try {
                     const cleanedJsonString = data.replace(/```json/g, "").replace(/```/g, "");
@@ -74,7 +74,20 @@ class ProfileController {
             next(error)
         }
     }
-
+    static async sendNotification(req, res, next) {
+        try {
+            const { userId } = req.params;
+            if (userId) {
+                SocketController.to(userId, 'notification', req.body);
+                res.status(200).json({ message: 'Notification sent successfully.' });
+                return
+            }
+            SocketController.emitEvent('notification', req.body)
+            res.status(200).json({ message: 'Notification sent successfully.' });
+        } catch (error) {
+            next(error)
+        }
+    }
 
 }
 

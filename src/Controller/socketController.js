@@ -1,9 +1,13 @@
+
+
+
 class SocketController {
   constructor() {
     if (!SocketController.instance) {
       this.io = null;  // io will be initialized later
       this.namespace = null;
       this.socket = null;
+      this.userSocketMap = new Map();
       SocketController.instance = this;
     }
     return SocketController.instance;
@@ -11,17 +15,24 @@ class SocketController {
 
   // Initialize with the io instance and namespace
   init(namespace, io) {
-    this.io = io.of(namespace); // Using namespace here
+    if (!this.io) {
+      this.io = io.of(namespace); // Using namespace here
 
-    // Setting up socket connections for the namespace
-    this.io.on("connection", (socket) => {
-      console.log(`⚡ Connected to socket at namespace ${namespace}:`, socket.id);
-      this.socket = socket;
+      // Setting up socket connections for the namespace
+      this.io.on("connection", (socket) => {
+        const { userId } = socket.handshake.query;
+        if (userId) {
+          this.userSocketMap.set(userId, socket.id); // Store userId -> socketId mapping
+        }
+        console.log(`⚡ Connected to socket at namespace ${namespace}:`, socket.id);
 
-      socket.on("disconnect", () => {
-        console.log("❌ User disconnected from namespace:", socket.id);
+        // Handle disconnection and clean up userSocketMap
+        socket.on("disconnect", () => {
+          userSocketMap.delete(userId);  // Clean up the map when the user disconnects
+          console.log("❌ User disconnected from namespace:", socket.id);
+        });
       });
-    });
+    }
   }
 
   // Emit events to the socket at the specified namespace
@@ -33,8 +44,32 @@ class SocketController {
       console.warn("⚠ No active socket connection in namespace");
     }
   }
+  to(userIds, eventName, data) {
+    if (this.io) {
+      if (Array.isArray(userIds)) {
+        userIds.forEach(userId => {
+          const socketId = this.userSocketMap.get(userId); // Get socketId for each user
+
+          if (socketId) {
+            this.io.to(socketId).emit(eventName, data);  // Emit to specific user
+            console.log(`Emitting ${eventName} event to user ${userId} with data:`, data);
+          } else {
+            console.warn(`⚠ User ${userId} not connected`);
+          }
+        });
+      } else {
+        const socketId = this.userSocketMap.get(userIds);  // Get socketId for the user
+        if (socketId) {
+          this.io.to(socketId).emit(eventName, data);
+        }
+      }
+
+    } else {
+      console.warn("⚠ No active socket connection in namespace");
+    }
+
+  }
 }
 
-// Export the singleton instance
 module.exports = new SocketController();
 

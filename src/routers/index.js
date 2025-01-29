@@ -846,6 +846,7 @@ router.post("/retryImage",CourseController.retryImage)
 router.patch("/profile/update/:id",ProfileController.updateProfile)
 router.get("/profile/get/:id",ProfileController.getProfile)
 router.post("/recommendedcourses",ProfileController.getRecommended)
+router.post("/notification/:userId?",ProfileController.sendNotification)
 
 
 
