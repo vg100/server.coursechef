@@ -1,5 +1,6 @@
-const Profile = require("../modals/Profile");
+
 const GenerativeAI = require("../Utils/GenerativeAI");
+const User = require("../modals/userr");
 const SocketController = require("./socketController");
 
 
@@ -25,7 +26,7 @@ class ProfileController {
     static async updateProfile(req, res, next) {
         try {
             const { id } = req.params;
-            await Profile.findOneAndUpdate({ userId: id }, req.body, { new: true });
+            await User.findOneAndUpdate({ _id: id }, req.body, { new: true });
             res.status(200).json({});
         } catch (error) {
             next(error);
@@ -37,11 +38,18 @@ class ProfileController {
     static async getProfile(req, res, next) {
         try {
             const { id } = req.params;
-            const getProfile = await Profile.findOne({ userId: id }).populate("subscription")
-            if (!getProfile) {
-                return res.status(404).json({ message: 'Profile not found' });
-            }
-            res.status(200).json(getProfile);
+            const profile = await User.findOne({ _id: id  })
+            .select('-password -resetPasswordToken -resetPasswordExpires -activityLog -__v')  // Exclude sensitive fields
+            .populate('subscription')
+            .populate('courses.courseId')
+            .populate('achievements.badges')
+            .populate('achievements.certificates.courseId');
+          
+          if (!profile) {
+            return res.status(404).json({ success: false, message: 'Profile not found' });
+          }
+          
+          res.status(200).json({ success: true, profile });
         } catch (error) {
             next(error)
         }

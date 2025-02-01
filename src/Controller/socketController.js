@@ -1,6 +1,5 @@
 
-
-
+const SocketRoutes = require("./socketService");
 class SocketController {
   constructor() {
     if (!SocketController.instance) {
@@ -24,11 +23,14 @@ class SocketController {
         if (userId) {
           this.userSocketMap.set(userId, socket.id); // Store userId -> socketId mapping
         }
+
+        SocketRoutes.init(socket);
+
         console.log(`⚡ Connected to socket at namespace ${namespace}:`, socket.id);
 
         // Handle disconnection and clean up userSocketMap
         socket.on("disconnect", () => {
-          userSocketMap.delete(userId);  // Clean up the map when the user disconnects
+          this.userSocketMap.delete(userId);  // Clean up the map when the user disconnects
           console.log("❌ User disconnected from namespace:", socket.id);
         });
       });
@@ -44,6 +46,16 @@ class SocketController {
       console.warn("⚠ No active socket connection in namespace");
     }
   }
+
+  on(eventName, callback) {
+    if (this.io) {
+      this.io.on(eventName, callback);
+      console.log(`Listening for ${eventName} event`);
+    } else {
+      console.warn("⚠ No active socket connection in namespace to listen for events");
+    }
+  }
+
   to(userIds, eventName, data) {
     if (this.io) {
       if (Array.isArray(userIds)) {

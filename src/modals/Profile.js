@@ -74,10 +74,25 @@ const settingsSchema = new mongoose.Schema({
 
 // Main profile schema
 const profileSchema = new mongoose.Schema({
+  email: { type: String, unique: true, required: true },
+    mName: String,
+    password: String,
+    type: String,
+    status: {
+      type: String,
+      enum: ['active', 'inactive', 'offline'],
+      default: 'offline'
+    },
+    isVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
+    
+    courseCount: { type: Number, default: 0 },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   fullName: { type: String },
   email: { type: String },
-  subscription: subscriptionSchema,
+  subscription: { type: mongoose.Schema.Types.ObjectId, ref: 'NewSubscription' },
   learningPreferences: {
     preferredLanguage: { type: String },
     areaOfInterest: [areaOfInterestSchema],

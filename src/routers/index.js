@@ -32,6 +32,8 @@ const UserController = require("../Controller/UserController");
 const CourseController = require("../Controller/CourseController");
 const logger = require("../Utils/logger");
 const ProfileController = require("../Controller/ProfileController");
+const RazorPayControllerr = require("../Controller/RazorPayControllerr");
+const socketController = require("../Controller/socketController");
 
 //INITIALIZE
 const router=Router();
@@ -848,6 +850,19 @@ router.get("/profile/get/:id",ProfileController.getProfile)
 router.post("/recommendedcourses",ProfileController.getRecommended)
 router.post("/notification/:userId?",ProfileController.sendNotification)
 
+
+
+
+
+//for subscriptions
+router.post("/subscriptions", RazorPayControllerr.createSubscription);
+router.post("/subscriptions/get", RazorPayControllerr.getSubscription);
+router.post("/subscriptions/:subscription_id", RazorPayControllerr.cancelSubscription);
+router.post("/subscriptions/:subscription_id/pause", RazorPayControllerr.pauseSubscription);
+router.post("/subscriptions/:subscription_id/resume", RazorPayControllerr.resumeSubscription);
+router.post("/subscriptions/:subscription_id/reactivate", RazorPayControllerr.reactivateSubscription);
+router.get("/subscriptions", RazorPayControllerr.getAllSubscriptions);
+router.post("/razorpay-webhook", RazorPayControllerr.handleWebhook);
 
 
 module.exports = router;

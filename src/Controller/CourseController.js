@@ -1,6 +1,6 @@
 const Showdown = require("showdown");
 const getEnvironmentVariables = require("../Environment/env");
-const User = require("../modals/User");
+const User = require("../modals/userr");
 const GenerativeAI = require("../Utils/GenerativeAI");
 const gis = require("g-i-s");
 const youtubesearchapi = require("youtube-search-api");
