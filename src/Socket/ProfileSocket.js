@@ -1,5 +1,5 @@
 const User = require("../modals/userr");
-const SocketController = require("./socketController");
+const GenerativeAI = require("../Utils/GenerativeAI");
 
 
 class ProfileSocket {
@@ -10,8 +10,11 @@ class ProfileSocket {
             .populate('courses.courseId')
             .populate('achievements.badges')
             .populate('achievements.certificates.courseId');
-        console.log(profile)
-        socket.emit("getProfileResponse", profile)
+            socket.emit("getProfileResponse", profile)
+    }
+    static async chat(socket, data) {
+            const text = await GenerativeAI.generateText(data)
+            socket.emit("ResponseQuesry", text)
     }
 }
 

@@ -1,5 +1,5 @@
 
-const SocketRoutes = require("./socketService");
+const SocketRoutes = require("../routers/socketService");
 class SocketController {
   constructor() {
     if (!SocketController.instance) {
